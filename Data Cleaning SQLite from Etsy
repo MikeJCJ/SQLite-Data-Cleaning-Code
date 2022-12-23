@@ -1,0 +1,52 @@
+--Prints values in dataset--
+SELECT * FROM 'Etsy Customer Sales Reduced'; 
+
+--Inserts data from another table into the full dataset'--
+INSERT INTO 'Etsy Payments Full' SELECT * FROM 'Etsy Payments 2022'; 
+
+--Remove duplicates--
+SELECT * FROM 'Etsy Payments Full' 
+WHERE EXISTS (
+  SELECT 1 FROM 'Etsy Payments Full' p2 
+  WHERE 'Etsy Payments Full'.'Order ID' = p2.'Order ID'
+  AND 'Etsy Payments Full'.rowid > p2.rowid
+);
+
+--Create Table with only necessary columns (Payments)--
+DROP TABLE if EXISTS 'Etsy Payments Reduced';
+CREATE TABLE 'Etsy Payments Reduced'
+    AS SELECT p.'Order ID', p.'Buyer Username', p.'Buyer', p.'Gross Amount', p.'Fees', p.'Net Amount', p.'Refund Amount'
+    FROM 'Etsy Payments Full' AS p
+    WHERE 'Order ID' IS NOT NULL;
+ALTER TABLE 'Etsy Payments Reduced' ADD Website;
+UPDATE 'Etsy Payments Reduced' SET Website = 'Etsy';
+
+
+--Create Table with only necessary columns (Sold Items)--
+DROP TABLE if EXISTS 'Etsy Sold Items Reduced';
+CREATE TABLE 'Etsy Sold Items Reduced'
+    AS SELECT i.'Order ID', i.'Item Name', i.'Variations',  i.'Quantity', i.'Price',i.'Coupon Code', i.'Coupon Details', i.'Discount Amount',
+    i.'Order Delivery', i.'Item Total', i.'Date Paid', i.'Date Posted', i.'Sale Date'
+    FROM 'Etsy Sold Items Full' AS i
+    WHERE 'Order ID' IS NOT NULL;
+ALTER TABLE 'Etsy Sold Items Reduced' ADD Website;
+UPDATE 'Etsy Sold Items Reduced' SET Website = 'Etsy';
+    
+--Create Table with only necessary columns (Customer Sales)--
+DROP TABLE if EXISTS 'Etsy Customer Sales Reduced';
+CREATE TABLE 'Etsy Customer Sales Reduced'
+    AS SELECT c.'Sale Date', c.'Order ID', c.'Buyer User ID', c.'First Name', c.'Last Name', c.'Delivery City',
+    c.'Delivery State', c.'Delivery Zipcode', c.'Delivery Country'
+    FROM 'Etsy Customer Sales Full' AS c
+    WHERE 'Order ID' IS NOT NULL;
+ALTER TABLE 'Etsy Customer Sales Reduced' ADD Website;
+UPDATE 'Etsy Customer Sales Reduced' SET Website = 'Etsy';
+
+--Create Table with only necessary columns (Listings)--
+DROP TABLE if EXISTS 'Etsy Listings Reduced';
+CREATE TABLE 'Etsy Listings Reduced'
+    AS SELECT l.'TITLE', l.'PRICE', l.'TAGS', l.'MATERIALS', l.'IMAGE1'
+    FROM 'Etsy Listings' AS l
+    WHERE 'Order ID' IS NOT NULL;
+ALTER TABLE 'Etsy Listings Reduced' ADD Website;
+UPDATE 'Etsy Listings Reduced' SET Website = 'Etsy';
